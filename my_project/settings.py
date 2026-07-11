@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-^ja1s0)238#&j=d&s&2qd4!^gh_6x$30ia6ec*iwse#q@1m70)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["tsdcem-college-website.onrender.com"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -119,6 +119,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "college_app" / "static"]
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 import mimetypes

@@ -265,6 +265,7 @@
         .banner-blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; backdrop-filter: blur(10px) brightness(0.72); background: rgba(2, 6, 23, 0.28); display: flex; align-items: center; padding: 30px 5%; gap: 35px; z-index: 1; }
         .brand-logo-frame { background: transparent; border: none; padding: 0; width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
         .brand-logo-frame img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.5)); }
+        .brand-logo-frame img { cursor: pointer; }
         .logo-fallback-text { color: #FFFFFF; font-weight: 800; font-size: 26px; text-align: center; line-height: 1.2; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
         .banner-text-block { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
         .banner-trust-tag { font-style: italic; color: #FF8833; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
@@ -272,6 +273,13 @@
         .banner-tagline { font-size: 14px; color: #F8FAFC; font-weight: 500; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); }
         .banner-institutional-details { font-size: 12px; color: #E2E8F0; font-weight: 500; margin-top: 8px; line-height: 1.5; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 6px; }
         .banner-institutional-details a { color: #FF8833; text-decoration: none; font-weight: 700; }
+
+        /* Entry video modal */
+        .video-modal-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.7); display: none; align-items: center; justify-content: center; z-index: 200000; }
+        .video-modal-overlay.open { display: flex; }
+        .video-modal { width: min(1100px, 96%); background: transparent; border-radius: 12px; padding: 8px; box-shadow: 0 20px 60px rgba(2,6,23,0.6); }
+        .video-modal video { width: 100%; height: auto; display: block; border-radius: 10px; background: #000; }
+        .video-modal-close { position: absolute; top: 18px; right: 18px; background: rgba(255,255,255,0.06); border: none; color: #fff; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
 
         /* Tabs Navigation */
         .side-menu-toggle {
@@ -776,7 +784,7 @@
     <header class="hero-header-banner">
         <div class="banner-blur-overlay">
             <div class="brand-logo-frame">
-                <img src="{% static 'images/logo.png' %}" onerror="this.style.display='none'; document.getElementById('shield-text-fallback').style.display='block';">
+                <img id="tsdcemLogo" src="{% static 'images/logo.png' %}" onerror="this.style.display='none'; document.getElementById('shield-text-fallback').style.display='block';" alt="TSDCEM logo">
                 <div id="shield-text-fallback" class="logo-fallback-text" style="display:none;">TSDCEM</div>
             </div>
             <div class="banner-text-block">
@@ -2054,6 +2062,16 @@ After exams, the Examination Cell oversees answer sheet evaluation, result proce
         </div>
 
     </main>
+    <!-- Entry video modal (hidden by default) -->
+    <div class="video-modal-overlay" id="entryVideoModal" role="dialog" aria-hidden="true">
+        <div class="video-modal" role="document">
+            <button class="video-modal-close" aria-label="Close video" id="entryVideoClose">✕</button>
+            <video id="entryVideo" controls preload="metadata">
+                <source src="{% static 'videos/entry_video.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
 
     <button class="cb-toggle-anchor" id="cbToggleBtn" onclick="toggleChatWindow()">💬</button>
     <div class="cb-window-box" id="cbWindow">
@@ -2179,6 +2197,46 @@ After exams, the Examination Cell oversees answer sheet evaluation, result proce
                 evt.currentTarget.classList.add("active");
             }
         }
+
+        // Entry video modal handlers
+        function openEntryVideoModal() {
+            const modal = document.getElementById('entryVideoModal');
+            const video = document.getElementById('entryVideo');
+            if (!modal || !video) return;
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            // try to autoplay if allowed (user gesture required in many browsers)
+            video.currentTime = 0;
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => { /* autoplay blocked; user can press play */ });
+            }
+        }
+
+        function closeEntryVideoModal() {
+            const modal = document.getElementById('entryVideoModal');
+            const video = document.getElementById('entryVideo');
+            if (!modal || !video) return;
+            video.pause();
+            video.currentTime = 0;
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const logo = document.getElementById('tsdcemLogo');
+            const modal = document.getElementById('entryVideoModal');
+            const closeBtn = document.getElementById('entryVideoClose');
+            if (logo) {
+                logo.addEventListener('click', (e) => {
+                    // Open modal when user clicks logo
+                    openEntryVideoModal();
+                });
+            }
+            if (closeBtn) closeBtn.addEventListener('click', closeEntryVideoModal);
+            if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeEntryVideoModal(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeEntryVideoModal(); });
+        });
 
         function toggleHomeSection(item) {
             const items = document.querySelectorAll('.home-accordion-item');
