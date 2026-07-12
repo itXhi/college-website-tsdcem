@@ -109,11 +109,3 @@ def download_fees(request):
     if not file_path or not os.path.exists(file_path):
         raise Http404("Fees file not found")
     return FileResponse(open(file_path, 'rb'), as_attachment=True, filename='fees.png')
-
-
-def landing(request):
-    """Render a simple landing splash page with the logo only.
-
-    Clicking the logo should navigate users to the main website view at `/home/`.
-    """
-    return render(request, 'college_app/landing.html')

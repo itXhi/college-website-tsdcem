@@ -6,7 +6,7 @@ from college_app import views  # Import your views directly here
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.landing, name='landing'),
+    path('', views.website_home, name='home'),
     path('home/', views.website_home, name='home'),
     path('download/fees/', views.download_fees, name='download_fees'),
 ]
