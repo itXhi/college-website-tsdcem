@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: tsdcem-college-website
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn my_project.wsgi:application"
